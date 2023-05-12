@@ -1,87 +1,102 @@
-// This file holds the main code for the plugin. It has access to the *document*.
-// You can access browser APIs such as the network by creating a UI which contains
-// a full browser environment (see documentation).
+const rules = {
+    frameIdentifier: "trait#",
+};
 
-// Runs this code if the plugin is run in Figma
-if (figma.editorType === "figma") {
-    // This plugin will open a window to prompt the user to enter a number, and
-    // it will then create that many rectangles on the screen.
+let store: Art = {
+    order: [],
+    layers: {},
+    selected: {},
+};
 
-    // This shows the HTML page in "ui.html".
-    figma.showUI(__html__);
+/**
+ *    ______           _                                    _           _
+ *   |  ____|         | |                                  (_)         | |
+ *   | |__     _ __   | |_   _ __   _   _   _ __     ___    _   _ __   | |_
+ *   |  __|   | '_ \  | __| | '__| | | | | | '_ \   / _ \  | | | '_ \  | __|
+ *   | |____  | | | | | |_  | |    | |_| | | |_) | | (_) | | | | | | | | |_
+ *   |______| |_| |_|  \__| |_|     \__, | | .__/   \___/  |_| |_| |_|  \__|
+ *                                   __/ | | |
+ *                                  |___/  |_|
+ **/
 
-    // Calls to "parent.postMessage" from within the HTML page will trigger this
-    // callback. The callback will be passed the "pluginMessage" property of the
-    // posted message.
-    figma.ui.onmessage = (msg) => {
-        // One way of distinguishing between different types of messages sent from
-        // your HTML page is to use an object with a "type" property like this.
-        if (msg.type === "create-shapes") {
-            const nodes: SceneNode[] = [];
-            for (let i = 0; i < msg.count; i++) {
-                const rect = figma.createRectangle();
-                rect.x = i * 150;
-                rect.fills = [{ type: "SOLID", color: { r: 1, g: 0.5, b: 0 } }];
-                figma.currentPage.appendChild(rect);
-                nodes.push(rect);
-            }
-            figma.currentPage.selection = nodes;
-            figma.viewport.scrollAndZoomIntoView(nodes);
-        }
+async function main(): Promise<void> {
+    if (!figma.editorType || figma.editorType !== "figma") {
+        exitFigma("This plugin is only available in Figma Design Files, not Figjam!");
+    }
 
-        // Make sure to close the plugin when you're done. Otherwise the plugin will
-        // keep running, which shows the cancel button at the bottom of the screen.
-        figma.closePlugin();
-    };
+    figma.showUI(__html__, {
+        width: 500,
+        height: 575,
+        title: "Generative Art Workbench",
+        themeColors: true,
+    });
 
-    // If the plugins isn't run in Figma, run this code
-} else {
-    // This plugin will open a window to prompt the user to enter a number, and
-    // it will then create that many shapes and connectors on the screen.
+    rigStore();
 
-    // This shows the HTML page in "ui.html".
-    figma.showUI(__html__);
-
-    // Calls to "parent.postMessage" from within the HTML page will trigger this
-    // callback. The callback will be passed the "pluginMessage" property of the
-    // posted message.
-    figma.ui.onmessage = (msg) => {
-        // One way of distinguishing between different types of messages sent from
-        // your HTML page is to use an object with a "type" property like this.
-        if (msg.type === "create-shapes") {
-            const numberOfShapes = msg.count;
-            const nodes: SceneNode[] = [];
-            for (let i = 0; i < numberOfShapes; i++) {
-                const shape = figma.createShapeWithText();
-                // You can set shapeType to one of: 'SQUARE' | 'ELLIPSE' | 'ROUNDED_RECTANGLE' | 'DIAMOND' | 'TRIANGLE_UP' | 'TRIANGLE_DOWN' | 'PARALLELOGRAM_RIGHT' | 'PARALLELOGRAM_LEFT'
-                shape.shapeType = "ROUNDED_RECTANGLE";
-                shape.x = i * (shape.width + 200);
-                shape.fills = [{ type: "SOLID", color: { r: 1, g: 0.5, b: 0 } }];
-                figma.currentPage.appendChild(shape);
-                nodes.push(shape);
-            }
-
-            for (let i = 0; i < numberOfShapes - 1; i++) {
-                const connector = figma.createConnector();
-                connector.strokeWeight = 8;
-
-                connector.connectorStart = {
-                    endpointNodeId: nodes[i].id,
-                    magnet: "AUTO",
-                };
-
-                connector.connectorEnd = {
-                    endpointNodeId: nodes[i + 1].id,
-                    magnet: "AUTO",
-                };
-            }
-
-            figma.currentPage.selection = nodes;
-            figma.viewport.scrollAndZoomIntoView(nodes);
-        }
-
-        // Make sure to close the plugin when you're done. Otherwise the plugin will
-        // keep running, which shows the cancel button at the bottom of the screen.
-        figma.closePlugin();
-    };
+    figma.ui.onmessage = handleUIMessage;
+    figma.on("selectionchange", sendSelectedFrames);
 }
+
+main().catch((err) => {
+    exitFigma(err);
+});
+
+/**
+ *    _    _          _
+ *   | |  | |        | |
+ *   | |__| |   ___  | |  _ __     ___   _ __   ___
+ *   |  __  |  / _ \ | | | '_ \   / _ \ | '__| / __|
+ *   | |  | | |  __/ | | | |_) | |  __/ | |    \__ \
+ *   |_|  |_|  \___| |_| | .__/   \___| |_|    |___/
+ *                       | |
+ *                       |_|
+ **/
+
+async function handleUIMessage(message: Message) {
+    switch (message.type) {
+        case "close":
+            exitFigma();
+            break;
+        default:
+            console.error(`handleUIMessage() can't handle "${message.type}" type messages`);
+            break;
+    }
+}
+
+function sendSelectedFrames(): void {
+    const selectedFrames = figma.currentPage.selection.filter((layer) => layer.type === "FRAME");
+
+    console.log(selectedFrames);
+
+    figma.ui.postMessage({
+        type: "display",
+        html: "loading",
+    });
+}
+
+async function rigStore(): Promise<boolean> {
+    console.log("Rigging store with page data");
+
+    const frames = figma.currentPage.children.filter(
+        (node) => node.type === "FRAME" && node.name.startsWith(rules.frameIdentifier)
+    );
+
+    console.log(frames);
+
+    figma.ui.postMessage({
+        type: "display",
+        html: "loading",
+    });
+
+    return true;
+}
+
+function exitFigma(message?: string): void {
+    const exitMessage = "👋 Exiting workbench";
+
+    console.warn(`${exitMessage}\n${message ? `(${message})` : ""}`);
+    figma.notify(`${exitMessage}\n${message ? `(${message})` : ""}`);
+    figma.closePlugin();
+}
+
+function buildHTMLFromSelectedFrames() {}
