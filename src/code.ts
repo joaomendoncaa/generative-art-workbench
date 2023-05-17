@@ -172,36 +172,39 @@ async function rigStore(): Promise<boolean> {
         let traitID = id;
 
         // add the trait layer to the store
-        if (Object.keys(store.layers).indexOf(traitType))
-            if (store.order.indexOf(traitType) === -1) {
-                // Add the order to both the store and the UI
-                store.order.push(traitType);
-
-                figma.ui.postMessage({
-                    type: "ui-update",
-                    selector: ".layers",
-                    html: store.order
-                        .map(
-                            (layer) => /*HTML*/ `
-                            <div data-layer="${layer}" class="layer">
-                                <span>
-                                    ${layer}
-                                    <bold>None</bold>
-                                </span>
-                                <div class="layer-controls">
-                                    <button onclick="viewFrame('${traitID}')">view frame</button>
-                                    <button class="up" onclick="updateLayerPosition('up', '${layer}')"><span>></span></button>
-                                    <button class="down" onclick="updateLayerPosition('down', '${layer}')"><span>></span></button>
-                                </div>
-                            </div>
-                        `
-                        )
-                        .join(""),
-                });
-            }
+        // if (!Object.keys(store.layers).indexOf(traitType))
+        if (store.order.indexOf(traitType) === -1) {
+            store.order.push(traitType);
+        }
     }
 
+    renderLayers();
+
     return true;
+}
+
+function renderLayers(): void {
+    figma.ui.postMessage({
+        type: "ui-update",
+        selector: ".layers",
+        html: store.order
+            .map(
+                (layer) => /*HTML*/ `
+                    <div data-layer="${layer}" class="layer">
+                        <span>
+                            ${layer}
+                            <bold>${store.selected[layer] ?? "None"}</bold>
+                        </span>
+                        <div class="layer-controls">
+                            <section data-layer="${layer}"></section>
+                            <button class="up" onclick="updateLayerPosition('up', '${layer}')"><span>></span></button>
+                            <button class="down" onclick="updateLayerPosition('down', '${layer}')"><span>></span></button>
+                        </div>
+                    </div>
+                `
+            )
+            .join(""),
+    });
 }
 
 /**
@@ -242,6 +245,24 @@ async function renderSelectedFrames(): Promise<void> {
         type: "ui-update",
         selector: ".display-wrapper",
         html,
+    });
+
+    Object.entries(store.selected).forEach(([key, value]) => {
+        figma.ui.postMessage({
+            type: "ui-update",
+            selector: ".layers > .layer[data-layer='" + key + "'] > span > bold",
+            html: figma.getNodeById(value)?.name.split("#")[2] ?? "None",
+        });
+    });
+
+    Object.entries(store.selected).forEach(([key, value]) => {
+        figma.ui.postMessage({
+            type: "ui-update",
+            selector: ".layer-controls > section[data-layer='" + key + "']",
+            html: /*HTML*/ `
+            <button class="view" data-layer="${key}" onclick="viewFrame('${store.selected[key]}')">view frame</button>
+            `,
+        });
     });
 }
 
