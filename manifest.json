@@ -1,17 +1,13 @@
 {
-  "name": "nft art workbench",
-  "id": "1238558860479467335",
-  "api": "1.0.0",
-  "main": "code.js",
-  "capabilities": [],
-  "enableProposedApi": false,
-  "editorType": [
-    "figma"
-  ],
-  "ui": "ui.html",
-  "networkAccess": {
-    "allowedDomains": [
-      "none"
-    ]
-  }
+    "name": "Generative Art Workbench",
+    "id": "1238558860479467335",
+    "api": "1.0.0",
+    "main": "dist/code.js",
+    "capabilities": [],
+    "enableProposedApi": false,
+    "editorType": ["figma"],
+    "ui": "ui.html",
+    "networkAccess": {
+        "allowedDomains": ["none"]
+    }
 }

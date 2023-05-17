@@ -1,135 +1,262 @@
 <style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
-    transform-origin: center;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    overflow: -moz-scrollbars-none;
-  }
-
-  *::-webkit-scrollbar {
-    display: none;
-  }
-
-  button {
-    cursor: pointer;
-  }
-
-  body {
-    display: flex;
-    padding: 1rem;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .figma-light body {
-    color: black;
-  }
-
-  .figma-dark body {
-    color: white;
-  }
-
-  .warning {
-    background: rgba(255, 255, 255, 0.05);
-    padding: 1rem;
-    border-radius: 6px;
-    font-weight: normal;
-  }
-
-  .warning>kbd {
-    background: rgba(255, 255, 255, 1);
-    color: black;
-    padding: 0 0.1rem;
-    border-radius: 3px;
-  }
-
-  .display-wrapper {
-    position: relative;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
-    overflow: hidden;
-    background: white;
-    background: linear-gradient(to right, rgba(20, 20, 20, 1) 0%, rgb(29, 29, 29) 50%, rgba(20, 20, 20, 1) 100%);
-    background-size: 200% 200%;
-    animation: container-shimmer 4s infinite linear;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 6px;
-  }
-
-  @keyframes container-shimmer {
-    from {
-      background-position: 0% 0%;
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+        transform-origin: center;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+        overflow: -moz-scrollbars-none;
+        transition: all 0.1s ease-in-out;
     }
 
-    to {
-      background-position: -200% 0%;
+    *::-webkit-scrollbar {
+        display: none;
     }
-  }
 
-  .controls {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-  }
+    button {
+        cursor: pointer;
+    }
 
-  .controls>button {
-    padding: 1rem 2rem;
-    border-radius: 6px;
-    background: #0C8CE9;
-    color: white;
-    font-size: 1rem;
-    border: none;
-    outline: none;
-    transition: all 0.075s ease-in-out;
-  }
+    body {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
 
-  .controls>button:active {
-    transform: scale(0.975);
-  }
+    .figma-light body {
+        color: black;
+    }
 
-  .controls>.randomize {
-    width: 100%;
-  }
+    .figma-dark body {
+        color: white;
+    }
+
+    .warning {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1rem;
+        border-radius: 6px;
+        font-weight: normal;
+    }
+
+    .warning>kbd {
+        background: rgba(255, 255, 255, 1);
+        color: black;
+        padding: 0 0.1rem;
+        border-radius: 3px;
+    }
+
+    .display-wrapper {
+        position: relative;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1;
+        overflow: hidden;
+        background: white;
+        background: linear-gradient(to right, rgba(32, 32, 32, 1) 0%, rgb(40, 40, 40) 50%, rgba(32, 32, 32, 1) 100%);
+        background-size: 200% 200%;
+        animation: container-shimmer 4s infinite linear;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .display-wrapper>svg {
+        position: absolute;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        shape-rendering: crispEdges;
+    }
+
+    @keyframes container-shimmer {
+        from {
+            background-position: 0% 0%;
+        }
+
+        to {
+            background-position: -200% 0%;
+        }
+    }
+
+    .controls {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0 1rem;
+    }
+
+    .controls>button {
+        padding: 1rem 2rem;
+        border-radius: 6px;
+        background: #0C8CE9;
+        color: white;
+        font-size: 1rem;
+        border: none;
+        outline: none;
+        transition: all 0.075s ease-in-out;
+    }
+
+    .controls>button:active {
+        transform: scale(0.975);
+    }
+
+    .controls>.randomize {
+        width: 100%;
+    }
+
+    .layers {
+        padding: 0 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .layer {
+        border-radius: 6px;
+        background: transparent;
+        display: flex;
+        flex-direction: flex;
+        justify-content: space-between;
+        overflow: hidden;
+        padding: 1rem;
+        border: 1px solid rgb(54, 54, 54);
+        gap: 0.25rem;
+        width: min-width;
+    }
+
+    .layer>span {
+        color: rgb(119, 119, 119);
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .layer>span>bold {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: white;
+    }
+
+    .layer-controls {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+        gap: 0.25rem;
+    }
+
+    .layer-controls>button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        text-align: center;
+        flex: 1;
+        padding: 0.25rem 1rem;
+        font-size: 1rem;
+        vertical-align: middle;
+        border: none;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.05);
+        color: white;
+    }
+
+    .layer-controls>button:hover {
+        background: #0C8CE9;
+    }
+
+    .up>span {
+        transform: rotate(-90deg);
+    }
+
+    .down>span {
+        transform: rotate(90deg);
+    }
 </style>
 
 <div class="display-wrapper">
 </div>
 <div class="controls">
-  <button class="randomize">Randomize Traits</button>
+    <button class="randomize">Randomize Traits</button>
+</div>
+<div class="layers">
+
 </div>
 
 <script>
-  const domElements = {
-    displayWrapper: document.querySelector(".display-wrapper"),
-    randomizeBtn: document.querySelector(".randomize"),
-  }
-
-  domElements.randomizeBtn.addEventListener("click", () => {
-    parent.postMessage({
-      pluginMessage: {
-        type: 'randomize'
-      }
-    }, '*');
-  })
-
-  window.addEventListener('message', event => {
-    const message = event.data.pluginMessage;
-
-    if (message.type === 'display') {
-      if (!message.html) {
-        console.error("No HTML sent under display");
-        return;
-      }
-
-      domElements.displayWrapper.innerHTML = message.html;
+    const domElements = {
+        displayWrapper: document.querySelector(".display-wrapper"),
+        randomizeBtn: document.querySelector(".randomize"),
     }
-  });
+
+    window.updateLayerPosition = updateLayerPosition;
+
+    domElements.randomizeBtn.addEventListener("click", () => {
+        parent.postMessage({
+            pluginMessage: {
+                type: 'randomize'
+            }
+        }, '*');
+    })
+
+    window.addEventListener('message', event => {
+        const message = event.data.pluginMessage;
+
+        switch (message.type) {
+            case 'ui-update':
+                if (!message.html || !message.selector) {
+                    console.error("Missing parameters for ui-update");
+                    return;
+                }
+
+                document.querySelector(message.selector).innerHTML = message.html;
+                break;
+            default:
+                console.error(`${message.type} not implemented`)
+                break;
+        }
+    });
+
+    function viewFrame(id) {
+        parent.postMessage({
+            pluginMessage: {
+                type: 'view-frame',
+                id
+            }
+        }, '*');
+    }
+
+    function updateLayerPosition(direction, layerName) {
+        const layerEl = document.querySelector(`[data-layer="${layerName}"]`);
+        const parentEl = layerEl.parentNode;
+
+        if (direction === 'up') {
+            const prevEl = layerEl.previousElementSibling;
+            if (prevEl) {
+                parentEl.insertBefore(layerEl, prevEl);
+            }
+        } else if (direction === 'down') {
+            const nextEl = layerEl.nextElementSibling;
+            if (nextEl) {
+                parentEl.insertBefore(nextEl, layerEl);
+            }
+        }
+
+        parent.postMessage({
+            pluginMessage: {
+                type: 'update-order',
+                order: Array.from(document.querySelector(".layers").children).map(node => node.dataset.layer)
+            }
+        }, '*');
+    }
 </script>

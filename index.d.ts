@@ -1,5 +1,7 @@
 declare interface Message {
     type: string;
+    id?: string;
+    order?: string[];
 }
 
 declare interface Art {
@@ -11,3 +13,5 @@ declare interface Art {
         [key: string]: string;
     };
 }
+
+declare module "uint8-to-base64";
