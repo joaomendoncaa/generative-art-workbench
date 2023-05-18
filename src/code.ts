@@ -107,7 +107,7 @@ async function handleUIMessage(message: Message): Promise<void> {
 
             break;
         case "randomize":
-            console.log(store.layers);
+            randomizeTraits();
 
             break;
         case "clear-canvas":
@@ -119,6 +119,16 @@ async function handleUIMessage(message: Message): Promise<void> {
 
             break;
     }
+}
+
+function randomizeTraits(): void {
+    for (let layer of store.order) {
+        store.selected[layer] = Object.values(store.layers[layer])[
+            Math.floor(Math.random() * Object.values(store.layers[layer]).length)
+        ];
+    }
+
+    renderSelectedFrames();
 }
 
 /**
@@ -178,7 +188,7 @@ function clearCanvas() {
  *
  * @return {void} This function does not return anything.
  */
-function deselectRepeatedTraitTypes() {
+function deselectRepeatedTraitTypes(): void {
     const newSelection: FrameNode[] = [];
 
     for (let traitType of store.order) {
