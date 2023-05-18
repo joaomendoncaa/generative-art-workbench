@@ -99,6 +99,8 @@
         font-size: 1rem;
         border: none;
         outline: none;
+        white-space: nowrap;
+        text-transform: uppercase;
         transition: all 0.075s ease-in-out;
     }
 
@@ -108,6 +110,10 @@
 
     .controls>.randomize {
         width: 100%;
+    }
+
+    .controls>.clear {
+        background: #414141;
     }
 
     .layers {
@@ -192,6 +198,7 @@
 </div>
 <div class="controls">
     <button class="randomize">Randomize Traits</button>
+    <button class="clear">Reset</button>
 </div>
 <div class="layers">
 
@@ -201,6 +208,7 @@
     const domElements = {
         displayWrapper: document.querySelector(".display-wrapper"),
         randomizeBtn: document.querySelector(".randomize"),
+        clearBtn: document.querySelector(".clear"),
     }
 
     window.updateLayerPosition = updateLayerPosition;
@@ -213,16 +221,19 @@
         }, '*');
     })
 
+    domElements.clearBtn.addEventListener("click", () => {
+        parent.postMessage({
+            pluginMessage: {
+                type: 'clear-canvas'
+            }
+        }, '*');
+    })
+
     window.addEventListener('message', event => {
         const message = event.data.pluginMessage;
 
         switch (message.type) {
             case 'ui-update':
-                if (!message.html || !message.selector) {
-                    console.error("Missing parameters for ui-update");
-                    return;
-                }
-
                 document.querySelector(message.selector).innerHTML = message.html;
                 break;
             default:

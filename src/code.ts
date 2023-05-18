@@ -110,6 +110,10 @@ async function handleUIMessage(message: Message): Promise<void> {
             console.log(store.layers);
 
             break;
+        case "clear-canvas":
+            clearCanvas();
+
+            break;
         default:
             console.error(`handleUIMessage() can't handle "${message.type}" type messages`);
 
@@ -138,6 +142,33 @@ function handleSelectionChange(): void {
     }
 
     renderSelectedFrames();
+}
+
+function clearCanvas() {
+    store.selected = {};
+
+    figma.ui.postMessage({
+        type: "ui-update",
+        selector: ".display-wrapper",
+        html: "",
+    });
+
+    for (let layer of store.order) {
+        figma.ui.postMessage({
+            type: "ui-update",
+            selector: `.layer[data-layer=${layer}] > .layer-controls`,
+            html: /*HTML*/ `
+                <button class="up" onclick="updateLayerPosition('up', '${layer}')"><span>></span></button>
+                <button class="down" onclick="updateLayerPosition('down', '${layer}')"><span>></span></button>
+            `,
+        });
+
+        figma.ui.postMessage({
+            type: "ui-update",
+            selector: `.layer[data-layer=${layer}] > span > bold`,
+            html: "None",
+        });
+    }
 }
 
 /**
@@ -183,8 +214,6 @@ async function rigStore(): Promise<boolean> {
 
         if (store.order.indexOf(traitType) === -1) store.order.push(traitType);
     }
-
-    console.log("STORE RIGGED", store);
 
     renderLayers();
 
