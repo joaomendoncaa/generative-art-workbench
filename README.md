@@ -1,3 +1,3 @@
-# NFT Art Workbench
+# Generative Art Workbench
 
-A tool to aid in making generative art on figma.
+A tool to aid in making generative art through figma.
