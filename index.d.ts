@@ -7,7 +7,9 @@ declare interface Message {
 declare interface Art {
     order: string[];
     layers: {
-        [key: string]: Set<{ name: string; id: string }>;
+        [key: string]: {
+            [key: string]: string;
+        };
     };
     selected: {
         [key: string]: string;

@@ -137,10 +137,16 @@ function handleSelectionChange(): void {
         store.selected[traitType] = id;
     }
 
-    // deselectRepeatedTraitTypes();
     renderSelectedFrames();
 }
 
+/**
+ * Deselects any repeated trait types from the current selection on the Figma page.
+ *
+ * TODO: Doesn't property work, deselections seems to be asynchronous and bugs may occur in the case of selecting and deselecting fast
+ *
+ * @return {void} This function does not return anything.
+ */
 function deselectRepeatedTraitTypes() {
     const newSelection: FrameNode[] = [];
 
@@ -167,16 +173,18 @@ async function rigStore(): Promise<boolean> {
 
     for (let i = 0; i < frames.length; i++) {
         let { name, id } = frames[i] as FrameNode;
-        let traitType = name.split("#")[1];
-        let traitName = name.split("#")[2];
-        let traitID = id;
+        let traitType: string = name.split("#")[1];
+        let traitName: string = name.split("#")[2];
+        let traitID: string = id;
 
-        // add the trait layer to the store
-        // if (!Object.keys(store.layers).indexOf(traitType))
-        if (store.order.indexOf(traitType) === -1) {
-            store.order.push(traitType);
-        }
+        if (!store.layers[traitType]) store.layers[traitType] = {};
+
+        store.layers[traitType][traitName] = traitID;
+
+        if (store.order.indexOf(traitType) === -1) store.order.push(traitType);
     }
+
+    console.log("STORE RIGGED", store);
 
     renderLayers();
 
