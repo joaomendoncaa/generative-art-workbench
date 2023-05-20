@@ -46,8 +46,10 @@ async function main(): Promise<void> {
         figma.ui.postMessage({
             type: "ui-update",
             selector: "body",
-            html: `
-             This design file doesn't have any traits.        
+            html: /*HTML*/ `
+                <p class="missing-traits">
+                    This design file doesn't have any frames with traits. Remember to follow the <span>trait#&lt;trait type&gt;#&lt;trait name&gt;</span> naming convention for each trait to be recognized by this plugin.
+                </p>
             `,
         });
 
@@ -188,10 +190,12 @@ async function displaySavedOrders() {
         html: existingOrders
             .map((order: string) => {
                 return /*HTML*/ `
-                <div>
-                    <span>${order}</span>
-                    <button onClick="loadOrder('${order}')">load</button>
-                    <button onClick="deleteLocalOrder('${order}')">delete</button>
+                <div class="saved-order">
+                    <span>${order.split(",").join(" > ")}</span>
+                    <div class="saved-order-controls">
+                        <button onClick="loadOrder('${order}')">load</button>
+                        <button onClick="deleteLocalOrder('${order}')">delete</button>
+                    </div>
                 </div>
             `;
             })
@@ -237,8 +241,10 @@ function handleSelectionChange(): void {
     for (let frame of selectedFrames) {
         const { name, id } = frame as FrameNode;
         let traitType = name.split("#")[1];
+        let traitName = name.split("#")[2];
 
-        store.selected[traitType] = id;
+        if (traitName.toLowerCase() === "none") delete store.selected[traitType];
+        else store.selected[traitType] = id;
     }
 
     renderSelectedFrames();

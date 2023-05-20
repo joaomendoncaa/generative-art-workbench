@@ -47,6 +47,24 @@
         border-radius: 3px;
     }
 
+    .missing-traits {
+        width: 100%;
+        padding: 0 1rem;
+
+        text-align: center;
+        white-space: normal;
+
+        display: inline-block;
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .missing-traits>span {
+        background: white;
+        color: black;
+    }
+
     .display-wrapper {
         position: relative;
         width: 100%;
@@ -91,10 +109,12 @@
         padding: 0 1rem;
     }
 
-    .controls>button {
+    .controls>button,
+    .save-order {
         padding: 1rem 2rem;
         border-radius: 3px;
         background: #0C8CE9;
+        width: 100%;
         color: white;
         font-size: 1rem;
         border: none;
@@ -166,7 +186,8 @@
         text-overflow: ellipsis;
     }
 
-    .layer-controls {
+    .layer-controls,
+    .saved-order-controls {
         display: flex;
         flex-direction: row;
         align-items: stretch;
@@ -174,7 +195,8 @@
         gap: 0.25rem;
     }
 
-    .layer-controls button {
+    .layer-controls button,
+    .saved-order-controls button {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -191,7 +213,8 @@
         color: white;
     }
 
-    .layer-controls button:hover {
+    .layer-controls button:hover,
+    .saved-order-controls button:hover {
         background: #0C8CE9;
     }
 
@@ -208,7 +231,23 @@
         flex-direction: column;
         gap: 0.5rem;
         padding: 0 1rem;
-        margin: 0 0 1rem 0;
+    }
+
+    .saved-order {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        padding: 0.25rem;
+    }
+
+    .saved-order>span {
+        text-transform: uppercase;
+        display: inline-block;
+    }
+
+    .saved-order-controls {
+        display: flex;
+        height: 100%;
     }
 </style>
 
