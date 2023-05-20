@@ -1,7 +1,7 @@
 declare interface Message {
     type: string;
     id?: string;
-    order?: string[];
+    order?: string[] | string;
 }
 
 declare interface Art {

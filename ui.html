@@ -117,12 +117,22 @@
     }
 
     .layers {
-        padding: 0 1rem;
+        padding: 0 1rem 1rem 1rem;
         display: flex;
         flex-direction: column;
         align-items: stretch;
         justify-content: space-between;
         gap: 0.5rem;
+    }
+
+    .layers-controls {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0 1rem;
+        margin: 0 0 1rem 0;
     }
 
     .layer {
@@ -192,6 +202,14 @@
     .down>span {
         transform: rotate(90deg);
     }
+
+    .saved-orders {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 0 1rem;
+        margin: 0 0 1rem 0;
+    }
 </style>
 
 <div class="display-wrapper">
@@ -203,12 +221,19 @@
 <div class="layers">
 
 </div>
+<div class="layers-controls">
+    <button class="save-order">save current layers order</button>
+</div>
+<div class="saved-orders">
+
+</div>
 
 <script>
     const domElements = {
         displayWrapper: document.querySelector(".display-wrapper"),
         randomizeBtn: document.querySelector(".randomize"),
         clearBtn: document.querySelector(".clear"),
+        saveBtn: document.querySelector(".save-order"),
     }
 
     window.updateLayerPosition = updateLayerPosition;
@@ -225,6 +250,14 @@
         parent.postMessage({
             pluginMessage: {
                 type: 'clear-canvas'
+            }
+        }, '*');
+    })
+
+    domElements.saveBtn.addEventListener("click", () => {
+        parent.postMessage({
+            pluginMessage: {
+                type: 'save-order'
             }
         }, '*');
     })
@@ -247,6 +280,24 @@
             pluginMessage: {
                 type: 'view-frame',
                 id
+            }
+        }, '*');
+    }
+
+    function loadOrder(order) {
+        parent.postMessage({
+            pluginMessage: {
+                type: 'update-order',
+                order: order.split(',')
+            }
+        }, '*');
+    }
+
+    function deleteLocalOrder(order) {
+        parent.postMessage({
+            pluginMessage: {
+                type: 'delete-order',
+                order
             }
         }, '*');
     }

@@ -56,6 +56,9 @@ async function main(): Promise<void> {
 
     figma.ui.onmessage = handleUIMessage;
     figma.on("selectionchange", handleSelectionChange);
+
+    displaySavedOrders();
+    loadFirstOrder();
 }
 
 main().catch((err) => {
@@ -101,8 +104,9 @@ async function handleUIMessage(message: Message): Promise<void> {
                 return;
             }
 
-            store.order = message.order;
+            store.order = message.order as string[];
 
+            renderLayers();
             renderSelectedFrames();
 
             break;
@@ -114,11 +118,99 @@ async function handleUIMessage(message: Message): Promise<void> {
             clearCanvas();
 
             break;
+        case "save-order":
+            saveCurrentOrder();
+
+            break;
+        case "delete-order":
+            if (!message.order) {
+                console.error("No order inside the message");
+                return;
+            }
+
+            deleteSavedOrder(message.order as string);
+
+            break;
         default:
             console.error(`handleUIMessage() can't handle "${message.type}" type messages`);
 
             break;
     }
+}
+
+async function deleteSavedOrder(order: string): Promise<void> {
+    let existingOrders = await figma.clientStorage.getAsync("orders");
+
+    if (!existingOrders) {
+        return;
+    }
+
+    existingOrders = existingOrders.filter((o: string) => o !== order);
+
+    await figma.clientStorage.setAsync("orders", existingOrders);
+
+    displaySavedOrders();
+}
+
+async function saveCurrentOrder(): Promise<void> {
+    if (store.order.length === 0) {
+        return;
+    }
+
+    const existingOrders = await figma.clientStorage.getAsync("orders");
+
+    if (existingOrders && existingOrders.includes(store.order.join(","))) {
+        figma.notify("Order is already saved locally", {
+            error: true,
+        });
+
+        return;
+    }
+
+    await figma.clientStorage.setAsync("orders", [
+        ...(existingOrders || []),
+        store.order.join(","),
+    ]);
+
+    displaySavedOrders();
+}
+
+async function displaySavedOrders() {
+    const existingOrders = await figma.clientStorage.getAsync("orders");
+
+    if (!existingOrders) {
+        return;
+    }
+
+    figma.ui.postMessage({
+        type: "ui-update",
+        selector: ".saved-orders",
+        html: existingOrders
+            .map((order: string) => {
+                return /*HTML*/ `
+                <div>
+                    <span>${order}</span>
+                    <button onClick="loadOrder('${order}')">load</button>
+                    <button onClick="deleteLocalOrder('${order}')">delete</button>
+                </div>
+            `;
+            })
+            .join(""),
+    });
+}
+
+async function loadFirstOrder(): Promise<void> {
+    const existingOrders = await figma.clientStorage.getAsync("orders");
+
+    if (!existingOrders || existingOrders.length === 0) {
+        return;
+    }
+
+    figma.notify(`Loading saved order: ${existingOrders[0]}`);
+    store.order = existingOrders[0].split(",");
+
+    renderLayers();
+    renderSelectedFrames();
 }
 
 function randomizeTraits(): void {
@@ -141,8 +233,6 @@ function handleSelectionChange(): void {
     const selectedFrames = figma.currentPage.selection.filter(
         (layer) => layer.type === "FRAME" && layer.name.startsWith(rules.frameIdentifier)
     );
-
-    if (!selectedFrames || selectedFrames.length === 0) store.selected = {};
 
     for (let frame of selectedFrames) {
         const { name, id } = frame as FrameNode;
@@ -271,9 +361,8 @@ function exitFigma(message?: string): void {
 
 async function renderSelectedFrames(): Promise<void> {
     if (!store.order) return console.error("No order or layers available");
-    if (!store.selected) return console.error("No selected layers yet");
 
-    let html: string = "";
+    let displayWrapperHTML: string = "";
 
     for (let layer of store.order) {
         if (!store.selected[layer]) continue;
@@ -281,7 +370,7 @@ async function renderSelectedFrames(): Promise<void> {
         try {
             let svg = await getImageFromFrameID(store.selected[layer]);
 
-            if (svg) html = svg + html;
+            if (svg) displayWrapperHTML = svg + displayWrapperHTML;
         } catch (err) {
             console.error(err);
             throw new Error((err as string).toString() ?? "Error trying to getFrameImage()");
@@ -291,7 +380,7 @@ async function renderSelectedFrames(): Promise<void> {
     figma.ui.postMessage({
         type: "ui-update",
         selector: ".display-wrapper",
-        html,
+        html: displayWrapperHTML,
     });
 
     Object.entries(store.selected).forEach(([key, value]) => {
@@ -307,7 +396,7 @@ async function renderSelectedFrames(): Promise<void> {
             type: "ui-update",
             selector: ".layer-controls > section[data-layer='" + key + "']",
             html: /*HTML*/ `
-            <button class="view" data-layer="${key}" onclick="viewFrame('${store.selected[key]}')">view frame</button>
+                <button class="view" data-layer="${key}" onclick="viewFrame('${store.selected[key]}')">view frame</button>
             `,
         });
     });
