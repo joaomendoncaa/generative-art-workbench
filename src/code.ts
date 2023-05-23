@@ -133,6 +133,39 @@ async function handleUIMessage(message: Message): Promise<void> {
             deleteSavedOrder(message.order as string);
 
             break;
+        case "replace-trait":
+            if (!message.layer) {
+                console.error("Missing layer to be replaced");
+                return;
+            }
+
+            figma.currentPage.selection = [];
+
+            let notification = figma.notify(
+                `Next frame you select will replace ${message.layer} currently selected`
+            );
+
+            const handleSelectionChangeTemporarily = () => {
+                const selectedFrame = figma.currentPage.selection[0];
+
+                if (!selectedFrame || selectedFrame.type !== "FRAME" || !message.layer) {
+                    figma.notify("No frame selected", {
+                        error: true,
+                        timeout: 2000,
+                    });
+
+                    return;
+                }
+
+                store.selected[message.layer] = selectedFrame.id;
+                notification.cancel();
+
+                figma.off("selectionchange", handleSelectionChangeTemporarily);
+            };
+
+            figma.on("selectionchange", handleSelectionChangeTemporarily);
+
+            break;
         default:
             console.error(`handleUIMessage() can't handle "${message.type}" type messages`);
 
@@ -354,6 +387,7 @@ function renderLayers(): void {
                             <section data-layer="${layer}"></section>
                             <button class="up" onclick="updateLayerPosition('up', '${layer}')"><span>></span></button>
                             <button class="down" onclick="updateLayerPosition('down', '${layer}')"><span>></span></button>
+                            <button onclick="replaceLayer('${layer}')">new</button>
                         </div>
                     </div>
                 `

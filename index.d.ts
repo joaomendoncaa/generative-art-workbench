@@ -2,6 +2,7 @@ declare interface Message {
     type: string;
     id?: string;
     order?: string[] | string;
+    layer?: string;
 }
 
 declare interface Art {

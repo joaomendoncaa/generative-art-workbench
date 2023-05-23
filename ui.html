@@ -321,6 +321,15 @@
         }
     });
 
+    function replaceLayer(layer) {
+        parent.postMessage({
+            pluginMessage: {
+                type: 'replace-trait',
+                layer
+            }
+        }, '*');
+    }
+
     function viewFrame(id) {
         parent.postMessage({
             pluginMessage: {
