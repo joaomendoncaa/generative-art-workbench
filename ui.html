@@ -17,6 +17,8 @@
 
     button {
         cursor: pointer;
+        text-transform: uppercase;
+        font-weight: 600;
     }
 
     body {
@@ -134,6 +136,11 @@
 
     .controls>.clear {
         background: #414141;
+    }
+
+    .controls>.clear:hover {
+        background: rgba(255, 0, 0, 0.3);
+        color: red;
     }
 
     .layers {
@@ -255,7 +262,7 @@
 </div>
 <div class="controls">
     <button class="randomize">Randomize Traits</button>
-    <button class="clear">Reset</button>
+    <button class="clear">Reset workbench</button>
 </div>
 <div class="layers">
 

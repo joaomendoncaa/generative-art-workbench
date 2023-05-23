@@ -218,12 +218,23 @@ async function loadFirstOrder(): Promise<void> {
 }
 
 function randomizeTraits(): void {
+    let newSelection: Record<string, string> = {};
+
     for (let layer of store.order) {
-        store.selected[layer] = Object.values(store.layers[layer])[
-            Math.floor(Math.random() * Object.values(store.layers[layer]).length)
-        ];
+        const newNode = figma.getNodeById(
+            Object.values(store.layers[layer])[
+                Math.floor(Math.random() * Object.values(store.layers[layer]).length)
+            ]
+        );
+
+        if (newNode && newNode.name.toLowerCase() !== "none") {
+            newSelection[layer] = newNode.id;
+        }
     }
 
+    store.selected = newSelection;
+
+    renderLayers();
     renderSelectedFrames();
 }
 
@@ -247,6 +258,7 @@ function handleSelectionChange(): void {
         else store.selected[traitType] = id;
     }
 
+    renderLayers();
     renderSelectedFrames();
 }
 
@@ -374,7 +386,9 @@ async function renderSelectedFrames(): Promise<void> {
         if (!store.selected[layer]) continue;
 
         try {
-            let svg = await getImageFromFrameID(store.selected[layer]);
+            let svg = await getImageFromFrameID(store.selected[layer]).catch((err) =>
+                console.error(err)
+            );
 
             if (svg) displayWrapperHTML = svg + displayWrapperHTML;
         } catch (err) {
@@ -402,7 +416,7 @@ async function renderSelectedFrames(): Promise<void> {
             type: "ui-update",
             selector: ".layer-controls > section[data-layer='" + key + "']",
             html: /*HTML*/ `
-                <button class="view" data-layer="${key}" onclick="viewFrame('${store.selected[key]}')">view frame</button>
+                <button class="view" data-layer="${key}" onclick="viewFrame('${store.selected[key]}')">VIEW</button>
             `,
         });
     });
