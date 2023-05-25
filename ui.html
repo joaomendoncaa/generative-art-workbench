@@ -321,6 +321,24 @@
         }
     });
 
+    function deleteLayer(layer) {
+        parent.postMessage({
+            pluginMessage: {
+                type: 'delete-trait',
+                layer
+            }
+        }, '*');
+    }
+
+    function randomizeLayer(layer) {
+        parent.postMessage({
+            pluginMessage: {
+                type: 'randomize-trait',
+                layer
+            }
+        }, '*');
+    }
+
     function replaceLayer(layer) {
         parent.postMessage({
             pluginMessage: {

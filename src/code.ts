@@ -1,4 +1,5 @@
 import { Base64 } from "js-base64";
+import icons from "./icons";
 
 const rules = {
     frameIdentifier: "trait#",
@@ -164,6 +165,38 @@ async function handleUIMessage(message: Message): Promise<void> {
             };
 
             figma.on("selectionchange", handleSelectionChangeTemporarily);
+
+            break;
+        case "randomize-trait":
+            if (!message.layer) {
+                console.error("Missing layer to be replaced");
+                return;
+            }
+
+            const newNode = figma.getNodeById(
+                Object.values(store.layers[message.layer])[
+                    Math.floor(Math.random() * Object.values(store.layers[message.layer]).length)
+                ]
+            );
+
+            if (newNode && newNode.name.toLowerCase() !== "none") {
+                store.selected[message.layer] = newNode.id;
+            }
+
+            renderLayers();
+            renderSelectedFrames();
+
+            break;
+        case "delete-trait":
+            if (!message.layer) {
+                console.error("Missing layer to be replaced");
+                return;
+            }
+
+            if (store.selected[message.layer]) delete store.selected[message.layer];
+
+            renderLayers();
+            renderSelectedFrames();
 
             break;
         default:
@@ -387,7 +420,9 @@ function renderLayers(): void {
                             <section data-layer="${layer}"></section>
                             <button class="up" onclick="updateLayerPosition('up', '${layer}')"><span>></span></button>
                             <button class="down" onclick="updateLayerPosition('down', '${layer}')"><span>></span></button>
-                            <button onclick="replaceLayer('${layer}')">new</button>
+                            <button onclick="replaceLayer('${layer}')">${icons.new}</button>
+                            <button onclick="randomizeLayer('${layer}')">${icons.randomize}</button>
+                            <button onclick="deleteLayer('${layer}')">${icons.delete}</button>
                         </div>
                     </div>
                 `
