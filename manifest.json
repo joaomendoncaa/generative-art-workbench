@@ -2,11 +2,11 @@
     "name": "Generative Art Workbench",
     "id": "1238558860479467335",
     "api": "1.0.0",
-    "main": "dist/code.js",
+    "main": "dist/index.js",
     "capabilities": [],
     "enableProposedApi": false,
     "editorType": ["figma"],
-    "ui": "ui.html",
+    "ui": "index.html",
     "networkAccess": {
         "allowedDomains": ["none"]
     }

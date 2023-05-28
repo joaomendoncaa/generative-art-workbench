@@ -2,7 +2,7 @@
     "name": "nft-art-workbench",
     "version": "1.0.0",
     "description": "A tool to aid in making generative art on figma.",
-    "main": "code.js",
+    "main": "main.js",
     "scripts": {
         "build": "webpack",
         "watch": "npm run build -- --watch"

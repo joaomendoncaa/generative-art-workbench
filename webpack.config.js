@@ -4,14 +4,12 @@ const webpack = require('webpack');
 module.exports = (env, argv) => ({
     mode: argv.mode === 'production' ? 'production' : 'development',
 
-    // This is necessary because Figma's 'eval' works differently than normal eval
     devtool: argv.mode === 'production' ? false : 'inline-source-map',
     entry: {
-        code: './src/code.ts' // This is the entry point for our plugin code.
+        code: './src/main.ts'
     },
     module: {
         rules: [
-            // Converts TypeScript code to JavaScript
             {
                 test: /\.tsx?$/,
                 use: 'ts-loader',
@@ -19,12 +17,11 @@ module.exports = (env, argv) => ({
             },
         ],
     },
-    // Webpack tries these extensions for you if you omit the extension like "import './file'"
     resolve: {
         extensions: ['.ts', '.js'],
     },
     output: {
-        filename: '[name].js',
+        filename: 'index.js',
         path: path.resolve(__dirname, 'dist'),
     },
 });
