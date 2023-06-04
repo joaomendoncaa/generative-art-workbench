@@ -3,7 +3,6 @@
 Generative Art Workbench is a helpful Figma plugin that simplifies the [process of testing and previewing](#how-to-use) different layer combinations for your generative art projects. With an [intuitive frame naming convention](#naming-convention), this plugin allows you to thoroughly experiment with various layers and efficiently generate composite previews inside Figma itself. By providing a practical solution within Figma's environment, the plugin highly streamlines your workflow and empowers you to quickly achieve the desired results in your generative/derivative style art.
 
 <br>
-<br>
 
 # How to use
 
@@ -22,13 +21,11 @@ Generative Art Workbench is a helpful Figma plugin that simplifies the [process 
 -   [x] Load or delete saved composite orders
 
 <br>
-<br>
 
 # Naming convention
 
 For the plugin to work this is **MANDATORY**!
 
-<br>
 <br>
 
 # Contribute
