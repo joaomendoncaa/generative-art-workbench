@@ -5,7 +5,7 @@ Generative Art Workbench is a helpful Figma plugin that simplifies the [process 
 # How to use
 
 -   Install the plugin through the [community marketplace](https://www.figma.com/community/plugin/1238558860479467335);
--   Name your layers/frames according to the [naming convention](#naming-convention). This is mandatory for the plugin to correctly work;
+-   Name your layers/frames according to the [naming convention](#naming-convention);
 -   Organize the layer order according to your desired composite order;
 -   Make changes to different layers and preview them on a real composite;
 
@@ -20,6 +20,6 @@ Generative Art Workbench is a helpful Figma plugin that simplifies the [process 
 
 # Naming convention
 
-For the plugin to work this is **MANDATORY**!
+> ⚠️ For the plugin to work this is **MANDATORY**!
 
 # Contribute
