@@ -337,6 +337,12 @@ function clearCanvas() {
         html: "",
     });
 
+    figma.ui.postMessage({
+        type: "ui-update",
+        selector: ".display-wrapper-floating",
+        html: "",
+    });
+
     for (let layer of store.order) {
         figma.ui.postMessage({
             type: "ui-update",
@@ -469,6 +475,12 @@ async function renderSelectedFrames(): Promise<void> {
     figma.ui.postMessage({
         type: "ui-update",
         selector: ".display-wrapper",
+        html: displayWrapperHTML,
+    });
+
+    figma.ui.postMessage({
+        type: "ui-update",
+        selector: ".display-wrapper-floating",
         html: displayWrapperHTML,
     });
 

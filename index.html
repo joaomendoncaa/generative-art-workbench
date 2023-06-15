@@ -82,7 +82,33 @@
         justify-content: center;
     }
 
-    .display-wrapper>svg {
+    .display-wrapper-floating {
+        user-select: none;
+        pointer-events: none;
+
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 50;
+
+        width: 40%;
+        height: auto;
+
+        aspect-ratio: 1;
+        overflow: hidden;
+        background: white;
+        background: linear-gradient(to right, rgba(32, 32, 32, 1) 0%, rgb(40, 40, 40) 50%, rgba(32, 32, 32, 1) 100%);
+        background-size: 200% 200%;
+        animation: container-shimmer 4s infinite linear;
+        display: none;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 5px;
+    }
+
+    .display-wrapper>svg,
+    .display-wrapper-floating>svg {
         position: absolute;
         z-index: 1;
         top: 0;
@@ -260,6 +286,8 @@
 
 <div class="display-wrapper">
 </div>
+<div class="display-wrapper-floating">
+</div>
 <div class="controls">
     <button class="randomize">Randomize Traits</button>
     <button class="clear">Reset workbench</button>
@@ -277,6 +305,7 @@
 <script>
     const domElements = {
         displayWrapper: document.querySelector(".display-wrapper"),
+        floatingDisplayWrapper: document.querySelector(".display-wrapper-floating"),
         randomizeBtn: document.querySelector(".randomize"),
         clearBtn: document.querySelector(".clear"),
         saveBtn: document.querySelector(".save-order"),
@@ -306,6 +335,11 @@
                 type: 'save-order'
             }
         }, '*');
+    })
+
+    window.addEventListener('scroll', event => {
+        if (window.scrollY > 200) domElements.floatingDisplayWrapper.style.display = "flex";
+        else domElements.floatingDisplayWrapper.style.display = "none";
     })
 
     window.addEventListener('message', event => {
